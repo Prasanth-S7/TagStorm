@@ -1,5 +1,6 @@
 import { EventBus } from "../../EventBus";
 import { Scene } from "phaser";
+import { characters } from "../../../common/common";
 
 export class OfficeMap extends Scene{
     constructor(){
@@ -7,9 +8,12 @@ export class OfficeMap extends Scene{
     }
     preload(){
         // Assets for this scene are loaded in the Preloader scene
+        //load the selected character from local storage
+        const selectedCharacter = window.localStorage.getItem('character');
+        const character = characters.find(character => character.charName === selectedCharacter)
         this.load.tilemapTiledJSON('house', '/assets/maps/house.json');
         this.load.image('house-tiles', '/assets/tiles/house-tiles.png');
-        this.load.image('avatar', '/assets/avatars/avatar.png');
+        this.load.image('avatar', character.charImg);
         //WE CAN ADD/LOAD SOME CHARACTERS OVER HERE 
     }
 
