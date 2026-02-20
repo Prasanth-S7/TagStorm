@@ -1,48 +1,9 @@
-import { EventBus } from "../../EventBus";
-import { Scene } from "phaser";
-import { characters } from "../../../common/common";
+import { BaseMap } from "./base-map";
+import { maps } from "../../../common/common";
 
-export class OfficeMap extends Scene{
-    constructor(){
-        super('OfficeMap');
-    }
-    preload(){
-        // Assets for this scene are loaded in the Preloader scene
-        //load the selected character from local storage
-        const selectedCharacter = window.localStorage.getItem('character');
-        const character = characters.find(character => character.charName === selectedCharacter)
-        this.load.tilemapTiledJSON('house', '/assets/maps/house.json');
-        this.load.image('house-tiles', '/assets/tiles/house-tiles.png');
-        this.load.image('avatar', character.charImg);
-        //WE CAN ADD/LOAD SOME CHARACTERS OVER HERE 
-    }
+const config = maps.find(m => m.sceneKey === 'OfficeMap');
 
-    create(){
-        const map = this.make.tilemap({key: "house"});
-        const tileset = map.addTilesetImage(map.tilesets[0].name, 'house-tiles');
-
-        map.createLayer('grass', tileset);
-        const walls = map.createLayer('walls', tileset);
-        walls.setCollisionByProperty({collides: true})
-
-        this.player = this.physics.add.sprite(400, 300, 'avatar');
-        this.physics.add.collider(this.player, walls);
-        this.cameras.main.startFollow(this.player);
-        EventBus.emit('current-scene-ready', this);
-
-    }
-    update() {
-        const keys = this.input.keyboard.addKeys({
-            up: Phaser.Input.Keyboard.KeyCodes.W,
-            down: Phaser.Input.Keyboard.KeyCodes.S,
-            left: Phaser.Input.Keyboard.KeyCodes.A,
-            right: Phaser.Input.Keyboard.KeyCodes.D,
-        });
-        const speed = 175;
-        this.player.setVelocity(0);
-        if (keys.left.isDown) this.player.setVelocityX(-speed);
-        else if (keys.right.isDown) this.player.setVelocityX(speed);
-        if (keys.up.isDown) this.player.setVelocityY(-speed);
-        else if (keys.down.isDown) this.player.setVelocityY(speed);
-    }
+export class OfficeMap extends BaseMap {
+    static SCENE_KEY = 'OfficeMap';
+    constructor() { super(config); }
 }
