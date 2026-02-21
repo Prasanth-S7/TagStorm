@@ -1,10 +1,9 @@
 import Phaser from 'phaser';
-import { BasicMap } from './scenes/maps/basic-map';
-import { OfficeMap } from './scenes/maps/house-map';
+import { GrassMap } from './scenes/maps/grass-map';
 
 // All registered map scenes.
 // To add a new map: import its Scene class and add it to this array.
-const ALL_SCENES = [BasicMap, OfficeMap];
+const ALL_SCENES = [GrassMap];
 
 /**
  * Starts the Phaser game with the selected map scene first.

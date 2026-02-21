@@ -34,31 +34,28 @@ export const characters = [
  */
 export const maps = [
     {
-        sceneKey: 'BasicMap',
-        name: 'Basic Map',
-        description: 'A wide open outdoor area — perfect for exploration.',
-        format: 'spritefusion',     // SpriteFusion JSON — loaded as raw JSON, converted at runtime
-        tilemapKey: 'basicmap',
-        tilemapJson: '/assets/maps/basicmap.json',
-        tilesetKey: 'basicmap-sprite',
-        tilesetImage: '/assets/tiles/basicmap-sprite.png',
-        bgLayer: 'Environment',
-        collisionLayer: 'Blocks',
+        sceneKey: 'GrassMap',
+        name: 'Grass Map',
+        description: 'A lush grassy map with various objects.',
+        format: 'tiled',
+        tilemapKey: 'grassmap',
+        tilemapJson: '/assets/maps/grassMap.json',
+        tilesets: [
+            { name: 'Grass', key: 'grass-tiles', image: '/assets/tiles/TX Tileset Grass.png' },
+            { name: 'Wall', key: 'wall-tiles', image: '/assets/tiles/TX Tileset Wall.png' },
+            { name: 'Plant', key: 'plant-tiles', image: '/assets/tiles/TX Plant.png' },
+            { name: 'TXProps', key: 'props-tiles', image: '/assets/tiles/TX Props.png' }
+        ],
+        layers: [
+            { name: 'Grass', collides: false },
+            { name: 'Statue', collides: true },
+            { name: 'Chair', collides: true },
+            { name: 'TombStone', collides: true },
+            { name: 'Stone', collides: true },
+            { name: 'FootPath', collides: false },
+            { name: 'Plants', collides: true }
+        ],
         spawnX: 400,
         spawnY: 300,
-    },
-    {
-        sceneKey: 'OfficeMap',
-        name: 'House',
-        description: 'A cosy indoor house with rooms to wander through.',
-        format: 'tiled',            // Standard Tiled Editor JSON
-        tilemapKey: 'housemap',
-        tilemapJson: '/assets/maps/house.json',
-        tilesetKey: 'house-tiles',
-        tilesetImage: '/assets/tiles/house-tiles.png',
-        bgLayer: 'grass',
-        collisionLayer: 'walls',
-        spawnX: 400,
-        spawnY: 300,
-    },
+    }
 ];
