@@ -57,5 +57,38 @@ export const maps = [
         ],
         spawnX: 400,
         spawnY: 300,
+    },
+    {
+        sceneKey: 'SeaMap',
+        name: 'Sea Map',
+        description: 'A vast sea map with various coastal elements.',
+        format: 'tiled',
+        tilemapKey: 'seamap',
+        tilemapJson: '/assets/maps/seamap.json',
+        tilesets: [
+            { name: 'Background', key: 'seamap-background', image: '/assets/tiles/background/Background.png' }
+        ],
+        layers: [
+            { name: 'Background', collides: false },
+            { name: 'Collision', collides: true, type: 'objectgroup' },
+            { name: 'Passthrough', collides: false, type: 'objectgroup' },
+            { name: 'BaseLayer', collides: false },
+        ],
+        objectTiles: [
+            { gid: 3090, key: 'obj-cargo-18', image: '/assets/tiles/cargos/18.png' },
+            { gid: 3091, key: 'obj-cargo-19', image: '/assets/tiles/cargos/19.png' },
+            { gid: 3086, key: 'obj-cargo-14', image: '/assets/tiles/cargos/14.png' },
+            { gid: 3094, key: 'obj-cargo-22', image: '/assets/tiles/cargos/22.png' },
+            { gid: 3095, key: 'obj-cargo-23', image: '/assets/tiles/cargos/23.png' },
+            { gid: 3100, key: 'obj-cargo-28', image: '/assets/tiles/cargos/28.png' },
+            { gid: 3103, key: 'obj-crane', image: '/assets/tiles/overheadcrane/Overhead-crane.png' },
+            { gid: 3106, key: 'obj-fence-1', image: '/assets/tiles/fencing/1.png' },
+            { gid: 3113, key: 'obj-fence-8', image: '/assets/tiles/fencing/8.png' },
+            { gid: 3114, key: 'obj-cart', image: '/assets/tiles/overheadcrane/Cart.png' },
+            { gid: 3104, key: 'base-tile', image: '/assets/tiles/tiles/tile_01.png' },
+
+        ],
+        spawnX: 100,
+        spawnY: 250,
     }
 ];
