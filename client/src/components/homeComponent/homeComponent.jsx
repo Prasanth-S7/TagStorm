@@ -1,16 +1,67 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import * as styles from "./home.module.css";
+import { SERVER_URL } from "../../config/config";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/8bit/card";
+import { Button } from "@/components/ui/8bit/button";
+import { Input } from "@/components/ui/8bit/input";
+
+import axios from "axios";
+
 
 export const HomeComponent = () => {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
+    const [username, setUsername] = useState("");
     const [roomId, setRoomId] = useState("");
 
-    const handleCreateRoom = () => {
-        // Logic to generate a random ID or hit an API
-        const newRoomId = Math.random().toString(36).substring(2, 9);
-        navigate(`/room/${newRoomId}`);
+    const handleCreateUser = async () => {
+        try {
+            const res = await axios.post(`${SERVER_URL}/api/user/register`, {
+                playerId: username
+            });
+            if(res.status === 201) {
+                window.localStorage.setItem('playerId', username);
+            }
+            setCreateUserModalOpen(false);
+        }
+        catch (error) {
+            setCreateUserModalOpen(false);
+            console.error("Error creating user:", error);
+        }
+    }
+
+    const handleCreateRoom = async () => {
+        try {
+            const playerId = window.localStorage.getItem('playerId');
+            if (!playerId) {
+                setCreateUserModalOpen(true);
+                return;
+            }
+            const res = await axios.post(`${SERVER_URL}/api/room/create`, {
+                playerId
+            })
+
+            if (res.status === 201) {
+                const { roomId } = res.data;
+                navigate(`/room/${roomId}`);
+                return;
+            }
+            else {
+                console.log("Error creating room:", res.data.error);
+                alert("Failed to create room. Please try again.");
+            }
+        }
+        catch (error) {
+            console.error("Error creating room:", error);
+        }
     };
 
     const handleJoinRoom = (e) => {
@@ -21,49 +72,101 @@ export const HomeComponent = () => {
     };
 
     return (
-        <div className={styles.container}>
-            <h1 className={`${styles.stepHeading} text-white`}>Welcome to the Workspace</h1>
-            
-            <div className={styles.cardContainer}>
-                {/* Create Room Card */}
-                <div className={styles.card} onClick={handleCreateRoom}>
-                    <div className={styles.icon}>➕</div>
-                    <h3>Create Room</h3>
-                    <p>Start a new session and invite others.</p>
-                </div>
+        <div className="flex flex-col items-center justify-center min-h-screen gap-8">
+            <h1 className="text-white text-4xl">Welcome  to  the  Workspace</h1>
 
-                {/* Join Room Card */}
-                <div className={styles.card} onClick={() => setIsModalOpen(true)}>
-                    <div className={styles.icon}>👥</div>
-                    <h3>Join Room</h3>
-                    <p>Enter an existing ID to join a session.</p>
-                </div>
+            <div className="flex flex-row gap-6 justify-center">
+                <Card className="cursor-pointer hover:opacity-80 transition-opacity w-md" onClick={handleCreateRoom}>
+                    <CardHeader>
+                        <CardTitle>➕ Create Room</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p>Start a new session and invite others</p>
+                    </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:opacity-80 transition-opacity w-md" onClick={() => setIsModalOpen(true)}>
+                    <CardHeader>
+                        <CardTitle>👥 Join Room</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p>Enter an existing ID to join a session</p>
+                    </CardContent>
+                </Card>
             </div>
 
-            {/* Join Room Modal */}
-            {isModalOpen && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalContent}>
-                        <h3>Join a Room</h3>
-                        <form onSubmit={handleJoinRoom}>
-                            <input 
-                                type="text" 
-                                placeholder="Enter Room ID..." 
-                                value={roomId}
-                                onChange={(e) => setRoomId(e.target.value)}
-                                className={styles.input}
+            {createUserModalOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <Card className="w-xl">
+                        <CardHeader>
+                            <CardTitle>Create a User</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="mb-5">Please create a user profile before creating a room</p>
+                            <Input
+                                type="text"
+                                onChange={(e) => setUsername(e.target.value)}
+                                value={username}
+                                placeholder="Enter Username"
+                                className="border border-border bg-input px-3 py-2 w-full"
                                 autoFocus
                             />
-                            <div className={styles.modalActions}>
-                                <button type="button" className={styles.backBtn} onClick={() => setIsModalOpen(false)}>
-                                    Cancel
-                                </button>
-                                <button type="submit" className={styles.primaryBtn}>
-                                    Join Now
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        </CardContent>
+                        <CardFooter className="flex flex-row gap-2 justify-end">
+                            <Button
+                                type="button"
+                                className="bg-secondary text-secondary-foreground px-4 py-2"
+                                onClick={() => setCreateUserModalOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                className="bg-primary text-primary-foreground px-4 py-2"
+                                onClick={handleCreateUser}
+                            >
+                                Create User
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </div>
+            )}
+
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <Card className="w-xl">
+                        <CardHeader>
+                            <CardTitle>Join a Room</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={handleJoinRoom} className="flex flex-col gap-4">
+                                <Input
+                                    type="text"
+                                    placeholder="Enter Room ID..."
+                                    value={roomId}
+                                    onChange={(e) => setRoomId(e.target.value)}
+                                    className="border border-border bg-input px-3 py-2 w-full"
+                                    autoFocus
+                                />
+                            </form>
+                        </CardContent>
+                        <CardFooter className="flex flex-row gap-2 justify-end">
+                            <Button
+                                type="button"
+                                className="bg-secondary text-secondary-foreground px-4 py-2"
+                                onClick={() => setIsModalOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                className="bg-primary text-primary-foreground px-4 py-2"
+                                onClick={handleJoinRoom}
+                            >
+                                Join Now
+                            </Button>
+                        </CardFooter>
+                    </Card>
                 </div>
             )}
         </div>
