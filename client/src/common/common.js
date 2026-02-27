@@ -40,6 +40,7 @@ export const maps = [
         format: 'tiled',
         tilemapKey: 'dungeon',
         tilemapJson: '/assets/maps/dungeon.json',
+        tileMapImage: '/assets/maps/dungeon.png',
         tilesets: [
             { name: 'tileset', key: 'dungeon-tiles', image: '/assets/tiles/tileset.png' },
         ],
