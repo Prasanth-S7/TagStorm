@@ -83,10 +83,54 @@ io.on("connection", (socket) => {
                 return;
             }
             io.to(roomId).emit("game-start", { roomId });
-            console.log(`Game started in room ${roomId} by ${sender.playerId}`);
+
+            // Assign a random player as "it"
+            const randomIndex = Math.floor(Math.random() * players.length);
+            for (let i = 0; i < players.length; i++) {
+                players[i]!.isIt = (i === randomIndex);
+            }
+            const itSocketId = players[randomIndex]!.socketId;
+            io.to(roomId).emit("tag-update", { itSocketId });
+
+            console.log(`Game started in room ${roomId} by ${sender.playerId}. ${itSocketId} is "it".`);
         } catch (error) {
             console.error("Error starting game:", error);
             socket.emit("error", { error: "An error occurred while starting the game" });
+        }
+    })
+
+    socket.on("request-tag-status", ({ roomId }) => {
+        const players = roomManager.getRoom(roomId);
+        if (!players) return;
+        const itPlayer = players.find(p => p.isIt);
+        if (itPlayer) {
+            socket.emit("tag-update", { itSocketId: itPlayer.socketId });
+        }
+    })
+
+    socket.on("tag", ({ roomId, taggedSocketId }) => {
+        try {
+            const players = roomManager.getRoom(roomId);
+            if (!players) return;
+
+            // Verify the sender is actually "it"
+            const tagger = players.find(p => p.socketId === socket.id);
+            if (!tagger?.isIt) return;
+
+            // Verify the tagged player exists in the room
+            const tagged = players.find(p => p.socketId === taggedSocketId);
+            if (!tagged) return;
+
+            // Transfer "it" status
+            for (const p of players) {
+                p.isIt = (p.socketId === taggedSocketId);
+            }
+
+            // Broadcast to everyone in the room
+            io.to(roomId).emit("tag-update", { itSocketId: taggedSocketId });
+            console.log(`[Tag] ${socket.id} tagged ${taggedSocketId} in room ${roomId}`);
+        } catch (error) {
+            console.error("Error handling tag:", error);
         }
     })
 
