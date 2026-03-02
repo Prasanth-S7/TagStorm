@@ -101,9 +101,12 @@ io.on("connection", (socket) => {
             const timeLeft = 120_000;
             const endTime = timeLeft + Date.now();
             io.to(roomId).emit("game-start", { roomId, endTime });
+            console.log(`[DEBUG] Setting timeout for room ${roomId}, will fire in ${timeLeft}ms`);
 
             const timeoutId = setTimeout(() => {
+                console.log(`[DEBUG] Timeout callback fired for room ${roomId}`);
                 const currentPlayers = roomManager.getRoom(roomId);
+                console.log(`[DEBUG] Current players for room ${roomId}:`, currentPlayers);
                 if (currentPlayers) {
                     const loser = currentPlayers.find(p => p.isIt);
                     const loserName = loser?.playerId || "Unknown";
@@ -111,6 +114,8 @@ io.on("connection", (socket) => {
                     io.to(roomId).emit("game-over", { loserName });
                     roomTimers.delete(roomId);
                     roomEndTimes.delete(roomId);
+                } else {
+                    console.log(`[Game Over] Room ${roomId} not found when timeout fired!`);
                 }
             }, timeLeft);
 
