@@ -143,10 +143,7 @@ export const Lobby = ({
                             <Button
                                 disabled={!canStart}
                                 onClick={onStart}
-                                className={
-                                    !canStart
-                                        ? "opacity-50 cursor-not-allowed p-5"
-                                        : ""
+                                className={`${!canStart ? "opacity-50 cursor-not-allowed" :""} p-5`
                                 }
                             >
                                 <span className="mr-1">

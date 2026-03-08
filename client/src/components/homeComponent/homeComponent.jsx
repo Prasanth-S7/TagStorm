@@ -99,7 +99,7 @@ export const HomeComponent = () => {
         >
             <Card className="px-5 pt-4">
                 <CardHeader className="text-center">
-                    <CardTitle className="text-xl">{title}</CardTitle>
+                    <CardTitle className="text-xl text-primary">{title}</CardTitle>
                 </CardHeader>
                 <CardContent className="mt-4">
                     <p className="text-sm text-center">{description}</p>

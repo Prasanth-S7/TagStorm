@@ -44,6 +44,11 @@ export class BaseMap extends Scene {
         }
 
         this.player = new Player(this, spawnX, spawnY);
+        this.itPointer = this.add.graphics();
+        this.itPointer.fillStyle(0xff0000, 1);
+        this.itPointer.fillTriangle(-8, 0, 8, 0, 0, 10); 
+        this.itPointer.setDepth(100);
+        this.itPointer.setVisible(false);
         this.lastSentX = Math.round(this.player.sprite.x);
         this.lastSentY = Math.round(this.player.sprite.y);
         collisionLayers.forEach(layer => {
@@ -234,6 +239,21 @@ export class BaseMap extends Scene {
         if (this.player) {
             this.player.update();
             this._broadcastPosition();
+        }
+        let itSprite = null;
+        if (this.isIt) {
+            itSprite = this.player.sprite;
+        } else if (this.currentItId) {
+            itSprite = this.remotePlayers.get(this.currentItId);
+        }
+
+        if (itSprite && itSprite.active) {
+            this.itPointer.setVisible(true);
+            const bob = Math.sin(this.time.now / 200) * 5; 
+            this.itPointer.x = itSprite.x;
+            this.itPointer.y = itSprite.y - 30 + bob;
+        } else {
+            this.itPointer.setVisible(false);
         }
     }
 
