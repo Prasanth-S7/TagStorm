@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SERVER_URL } from "../../config/config";
 import {
@@ -23,6 +23,13 @@ export const HomeComponent = () => {
     const [username, setUsername] = useState("");
     const [roomId, setRoomId] = useState("");
     const [pendingAction, setPendingAction]  = useState(null);
+
+    useEffect(() => {
+        const playerId = window.localStorage.getItem("playerId");
+        if(!playerId){
+            setCreateUserModalOpen(true);
+        }
+    }, [])
 
     const handleCreateUser = async () => {
         try {

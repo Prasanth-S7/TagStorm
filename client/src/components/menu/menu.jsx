@@ -1,16 +1,102 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/8bit/button";
 import { Help } from "@/components/help/help";
 import { useMusic } from "./musicContext";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/8bit/card";
+import { Input } from "@/components/ui/8bit/input";
+import axios from "axios";
+import { SERVER_URL } from "@/config/config";
+import { Pencil } from "lucide-react"
 
 export const Menu = () => {
+
     const [helpCardOpened, setHelpCardOpened] = useState(false);
     const {isPlaying, toggleMusic} = useMusic();
+    const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+    const [playerId, setPlayerId] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
+    const inputRef = useRef(null);
+ 
+    useEffect(() => {
+        const playerId = window.localStorage.getItem("playerId");
+        if(playerId){
+            setPlayerId(playerId);
+        }
+    }, [])
+
+    const handleChangeUsername = async (username) => {
+        try {
+            const res = await axios.post(`${SERVER_URL}/api/user/register`, {
+                playerId: username
+            });
+            if(res.status === 201) {
+                window.localStorage.setItem('playerId', username);
+                setSettingsModalOpen(false);
+            }
+        }
+        catch (error) {
+            console.error("Error creating user:", error);
+        }
+    }
 
     return (
         <>
+        {
+            settingsModalOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-lg">
+                    <Card className="w-xl px-5 pt-4">
+                        <CardHeader>
+                            <CardTitle className="text-center text-xl text-primary">SETTINGS</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex flex-col space-x-2">
+                            <div className="flex space-x-2 items-center justify-between">
+                                <p>Username</p>
+                                <Input
+                                    value={playerId}
+                                    disabled={!isEditing}
+                                    onChange={(e) => setPlayerId(e.target.value)}
+                                    ref= {inputRef}
+                                />
+                                <Button onClick={() => {
+                                    setIsEditing(true)
+                                    setTimeout(() => inputRef.current?.focus(), 0)
+                                }}
+                                    >
+                                    <Pencil />
+                                </Button>
+                            </div>
+                        </CardContent>
+                        <CardFooter className="flex flex-row gap-2 justify-end pb-7">
+                            <Button
+                                type="button"
+                                className="bg-secondary text-secondary-foreground px-4 py-2"
+                                onClick={() => setSettingsModalOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                className="bg-primary text-primary-foreground px-4 py-2"
+                                onClick={() => handleChangeUsername(playerId)}
+                            >
+                                Save
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </div>
+            )
+        }
             <div className="fixed top-6 right-6 flex flex-col gap-4 z-50">
-                <Button variant="outline" className="p-2">
+                <Button variant="outline" className="p-2" onClick={() => {
+                    setSettingsModalOpen(!settingsModalOpen)
+                }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-settings size-6"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                 </Button>
                 <Button variant="outline" className="p-2" onClick={toggleMusic}>
